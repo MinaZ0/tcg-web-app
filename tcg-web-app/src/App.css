@@ -200,3 +200,83 @@ body {
 .buy-btn:hover {
   background-color: #e6c200;
 }
+
+/* ------------------------------------------- */
+/* ระบบตะกร้าสินค้า (Cart) */
+/* ------------------------------------------- */
+
+.header-actions {
+  display: flex;
+  gap: 16px;
+  align-items: center;
+}
+
+.cart-btn-wrapper {
+  position: relative;
+}
+
+.cart-badge {
+  position: absolute;
+  top: -5px;
+  right: -8px;
+  background-color: #f87171; /* สีแดง */
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  border-radius: 50%;
+  padding: 2px 6px;
+}
+
+.cart-item {
+  display: flex;
+  align-items: center;
+  background-color: #1E1E1E;
+  border: 1px solid rgba(255, 215, 0, 0.2);
+  padding: 12px;
+  border-radius: 12px;
+  margin-bottom: 12px;
+}
+
+.cart-item-img {
+  width: 60px;
+  height: 85px;
+  object-fit: cover;
+  border-radius: 8px;
+  margin-right: 16px;
+}
+
+.cart-item-info {
+  flex: 1;
+}
+
+.remove-btn {
+  background-color: transparent;
+  color: #f87171;
+  border: 1px solid #f87171;
+  padding: 6px 12px;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: bold;
+  transition: 0.2s;
+}
+
+.remove-btn:hover {
+  background-color: #f87171;
+  color: white;
+}
+
+.checkout-box {
+  background-color: #1E1E1E;
+  border: 1px solid #FFD700;
+  border-radius: 20px;
+  padding: 20px;
+  margin-top: 30px;
+  text-align: center;
+}
+
+.empty-cart {
+  text-align: center;
+  color: #aaaaaa;
+  padding: 40px 0;
+  font-size: 16px;
+}
