@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import './App.css';
 
 // ----------------------------------------------------------------------
-// Component: การ์ด 3D Holographic
+// 1. Component: การ์ด 3D Holographic
 // ----------------------------------------------------------------------
 function Interactive3DCard({ image, name }) {
   const cardRef = useRef(null);
@@ -42,7 +42,7 @@ function Interactive3DCard({ image, name }) {
 }
 
 // ----------------------------------------------------------------------
-// Component หลัก
+// 2. Component หลัก: ควบคุมหน้าจอและลอจิกทั้งหมด
 // ----------------------------------------------------------------------
 function App() {
   // 🌟 State สำหรับระบบบัญชี
@@ -78,11 +78,19 @@ function App() {
   // ----------------------------------------------------------------------
   const handleLogin = (e) => {
     e.preventDefault();
-    if (username && password) {
+    
+    if (!username || !password) {
+      alert("กรุณากรอก Username และ Password ให้ครบถ้วนครับ!");
+      return;
+    }
+
+    // 🌟 ระบบรหัสลับสำหรับ Dev (Username: dev, Password: 1234)
+    if (username === "dev" && password === "1234") {
       setIsLoggedIn(true);
       setCurrentView("market");
+      alert("ยินดีต้อนรับเข้าสู่โหมด Developer 🛠️");
     } else {
-      alert("กรุณากรอก Username และ Password ให้ครบถ้วนครับ!");
+      alert("Username หรือ Password ไม่ถูกต้อง!");
     }
   };
 
@@ -97,7 +105,7 @@ function App() {
       return;
     }
     alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${username}`);
-    setAuthMode("login"); // กลับไปหน้า Login
+    setAuthMode("login"); 
     setPassword("");
     setConfirmPassword("");
   };
@@ -136,17 +144,11 @@ function App() {
             <p className="auth-subtitle">ตลาดการ์ดระดับพรีเมียม</p>
           )}
 
-          {/* แท็บสลับหน้า (ซ่อนถ้าอยู่หน้าลืมรหัสผ่าน) */}
+          {/* แท็บสลับหน้า */}
           {authMode !== "forgot" && (
             <div className="auth-tabs">
-              <button 
-                className={`auth-tab-btn ${authMode === "login" ? "active" : ""}`}
-                onClick={() => setAuthMode("login")}
-              >เข้าสู่ระบบ</button>
-              <button 
-                className={`auth-tab-btn ${authMode === "register" ? "active" : ""}`}
-                onClick={() => setAuthMode("register")}
-              >สมัครสมาชิก</button>
+              <button className={`auth-tab-btn ${authMode === "login" ? "active" : ""}`} onClick={() => setAuthMode("login")}>เข้าสู่ระบบ</button>
+              <button className={`auth-tab-btn ${authMode === "register" ? "active" : ""}`} onClick={() => setAuthMode("register")}>สมัครสมาชิก</button>
             </div>
           )}
 
@@ -179,14 +181,13 @@ function App() {
               <button type="button" className="auth-text-link" onClick={() => setAuthMode("login")}>⬅ กลับไปหน้าเข้าสู่ระบบ</button>
             </form>
           )}
-
         </div>
       </div>
     );
   }
 
   // ----------------------------------------------------------------------
-  // โค้ดเดิม (ระบบตะกร้าและชำระเงิน)
+  // ฟังก์ชันและหน้าจอฝั่ง E-Commerce (ทำงานเมื่อ Login แล้ว)
   // ----------------------------------------------------------------------
   const displayedCards = allCards.filter(card => card.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
@@ -195,14 +196,19 @@ function App() {
     alert(`เพิ่ม ${card.name} ลงตะกร้าแล้ว!`);
     setCurrentView("market");
   };
+  
   const removeFromCart = (id) => setCart(cart.filter(item => item.cartId !== id));
+  
   const getCartTotalNumber = () => cart.reduce((sum, item) => sum + parseInt(item.price.replace(/[^0-9]/g, '')), 0);
 
   const handleCheckout = () => {
     const total = getCartTotalNumber();
     if (balance < total) return alert("ยอดเงินในกระเป๋าไม่พอ! กรุณาเติมเงิน 🥲");
     setBalance(balance - total);
-    setTransactions([{ id: Date.now(), title: `ซื้อการ์ด ${cart.length} ใบ`, amount: `-฿${total.toLocaleString()}`, isIncome: false, date: "02 มิ.ย. 69" }, ...transactions]);
+    setTransactions([
+      { id: Date.now(), title: `ซื้อการ์ด ${cart.length} ใบ`, amount: `-฿${total.toLocaleString()}`, isIncome: false, date: "02 มิ.ย. 69" }, 
+      ...transactions
+    ]);
     setCart([]);
     alert("ชำระเงินสำเร็จ! ขอบคุณที่อุดหนุนครับ 🎉");
     setCurrentView("wallet");
