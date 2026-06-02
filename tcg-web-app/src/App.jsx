@@ -46,12 +46,16 @@ function Interactive3DCard({ image, name }) {
 // Component หลัก: ควบคุมหน้าจอทั้งหมด
 // ----------------------------------------------------------------------
 function App() {
+  // 🌟 ไฮไลต์: State สำหรับระบบ Login
+  const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [username, setUsername] = useState("");
+  const [password, setPassword] = useState("");
+
   const [currentView, setCurrentView] = useState("market"); 
   const [selectedCard, setSelectedCard] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState([]);
 
-  // 🌟 ไฮไลต์: เปลี่ยนยอดเงินและประวัติให้เป็น State
   const [balance, setBalance] = useState(12450);
   const [transactions, setTransactions] = useState([
     { id: 1, title: "ขาย Mewtwo GX", amount: "+฿1,200", isIncome: true, date: "14 พ.ค. 69" },
@@ -65,6 +69,61 @@ function App() {
     { id: 3, name: "Mewtwo GX", price: "฿4,200", condition: "Played", image: "https://images.pokemontcg.io/sm35/78_hires.png" },
     { id: 4, name: "Rayquaza VMAX", price: "฿5,500", condition: "Mint", image: "https://images.pokemontcg.io/swsh7/111_hires.png" },
   ];
+
+  // ฟังก์ชันจัดการตอนกด Login
+  const handleLogin = (e) => {
+    e.preventDefault(); // ป้องกันเว็บรีเฟรชตอนกด Submit
+    if (username !== "" && password !== "") {
+      setIsLoggedIn(true);
+    } else {
+      alert("กรุณากรอก Username และ Password ให้ครบถ้วนครับ!");
+    }
+  };
+
+  // ฟังก์ชันจัดการตอนกด Logout
+  const handleLogout = () => {
+    setIsLoggedIn(false);
+    setCurrentView("market"); // รีเซ็ตหน้ากลับไปที่ตลาด
+    setUsername("");
+    setPassword("");
+  };
+
+  // ----------------------------------------------------------------------
+  // หน้าจอ: Login
+  // ----------------------------------------------------------------------
+  if (!isLoggedIn) {
+    return (
+      <div className="login-wrapper">
+        <div className="login-box">
+          <div className="login-logo">⚡</div>
+          <h1 className="login-title">PIKACHU MARKET</h1>
+          <p className="login-subtitle">ลงชื่อเข้าใช้เพื่อเข้าสู่ตลาดการ์ดระดับพรีเมียม</p>
+          
+          <form className="login-form" onSubmit={handleLogin}>
+            <input 
+              type="text" 
+              placeholder="Username" 
+              className="login-input"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+            />
+            <input 
+              type="password" 
+              placeholder="Password" 
+              className="login-input"
+              value={password}
+              onChange={(e) => setPassword(e.target.value)}
+            />
+            <button type="submit" className="buy-btn" style={{ marginTop: '8px' }}>
+              เข้าสู่ระบบ
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // (ส่วนที่เหลือทำงานปกติเมื่อ isLoggedIn = true)
 
   const displayedCards = allCards.filter(card =>
     card.name.toLowerCase().includes(searchQuery.toLowerCase())
@@ -81,7 +140,6 @@ function App() {
     setCart(cart.filter(item => item.cartId !== cartIdToRemove));
   };
 
-  // ดึงยอดรวมมาเป็นตัวเลข (เพื่อเอาไปคำนวณ)
   const getCartTotalNumber = () => {
     return cart.reduce((sum, item) => {
       const numericPrice = parseInt(item.price.replace(/[^0-9]/g, ''));
@@ -89,30 +147,21 @@ function App() {
     }, 0);
   };
 
-  // 🌟 ไฮไลต์: ฟังก์ชันยืนยันการสั่งซื้อ
   const handleCheckout = () => {
     const total = getCartTotalNumber();
-    
-    // 1. เช็คยอดเงิน
     if (balance < total) {
       alert("ยอดเงินในกระเป๋าไม่พอ! กรุณาเติมเงิน 🥲");
       return;
     }
-
-    // 2. หักยอดเงิน
     setBalance(balance - total);
-
-    // 3. สร้างประวัติรายจ่ายใหม่แปะไว้บนสุด
     const newTx = {
       id: Date.now(),
       title: `ซื้อการ์ด ${cart.length} ใบ`,
       amount: `-฿${total.toLocaleString()}`,
       isIncome: false,
-      date: "02 มิ.ย. 69" // วันที่จำลอง
+      date: "02 มิ.ย. 69"
     };
     setTransactions([newTx, ...transactions]);
-
-    // 4. ล้างตะกร้า แจ้งเตือน และเด้งไปหน้ากระเป๋าเงิน
     setCart([]);
     alert("ชำระเงินสำเร็จ! ขอบคุณที่อุดหนุนครับ 🎉");
     setCurrentView("wallet");
@@ -130,14 +179,11 @@ function App() {
 
         <div className="detail-container">
           <Interactive3DCard image={selectedCard.image} name={selectedCard.name} />
-          
           <div className="action-box">
             <p style={{ color: '#aaaaaa', marginBottom: '8px' }}>ราคาปัจจุบัน</p>
             <h2 style={{ color: '#FFD700', fontSize: '32px' }}>{selectedCard.price}</h2>
             <p style={{ marginTop: '8px', marginBottom: '20px' }}>สภาพ: {selectedCard.condition}</p>
-            <button className="buy-btn" onClick={() => addToCart(selectedCard)}>
-              หยิบใส่ตะกร้า
-            </button>
+            <button className="buy-btn" onClick={() => addToCart(selectedCard)}>หยิบใส่ตะกร้า</button>
           </div>
         </div>
       </div>
@@ -171,6 +217,11 @@ function App() {
               </div>
             ))}
           </div>
+
+          {/* ปุ่ม Logout ในหน้ากระเป๋าเงิน */}
+          <button className="logout-btn" onClick={handleLogout}>
+            ออกจากระบบ
+          </button>
         </div>
       </div>
     );
@@ -208,10 +259,7 @@ function App() {
               <div className="checkout-box">
                 <p style={{ color: '#aaaaaa', marginBottom: '8px' }}>ยอดชำระทั้งหมด</p>
                 <h2 style={{ color: '#FFD700', fontSize: '32px' }}>฿{getCartTotalNumber().toLocaleString()}</h2>
-                {/* ปุ่มยืนยันสั่งซื้อ ที่ผูกกับฟังก์ชันหักเงิน */}
-                <button className="buy-btn" onClick={handleCheckout}>
-                  ยืนยันการสั่งซื้อ
-                </button>
+                <button className="buy-btn" onClick={handleCheckout}>ยืนยันการสั่งซื้อ</button>
               </div>
             </>
           )}
@@ -225,7 +273,6 @@ function App() {
     <div className="app-container">
       <header className="header">
         <h1 className="title">PIKACHU MARKET</h1>
-        
         <div className="header-actions">
           <div className="cart-btn-wrapper" onClick={() => setCurrentView("cart")} style={{ cursor: 'pointer' }}>
             <span style={{ fontSize: '24px' }}>🛒</span>
