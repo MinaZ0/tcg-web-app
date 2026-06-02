@@ -2,7 +2,7 @@ import { useState, useRef } from 'react';
 import './App.css';
 
 // ----------------------------------------------------------------------
-// Component: การ์ด 3D Holographic (เหมือนเดิม)
+// Component: การ์ด 3D Holographic
 // ----------------------------------------------------------------------
 function Interactive3DCard({ image, name }) {
   const cardRef = useRef(null);
@@ -46,12 +46,18 @@ function Interactive3DCard({ image, name }) {
 // Component หลัก: ควบคุมหน้าจอทั้งหมด
 // ----------------------------------------------------------------------
 function App() {
-  const [currentView, setCurrentView] = useState("market"); // "market" | "detail" | "wallet" | "cart"
+  const [currentView, setCurrentView] = useState("market"); 
   const [selectedCard, setSelectedCard] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
-  
-  // 🌟 ไฮไลต์: State สำหรับเก็บของในตะกร้า
   const [cart, setCart] = useState([]);
+
+  // 🌟 ไฮไลต์: เปลี่ยนยอดเงินและประวัติให้เป็น State
+  const [balance, setBalance] = useState(12450);
+  const [transactions, setTransactions] = useState([
+    { id: 1, title: "ขาย Mewtwo GX", amount: "+฿1,200", isIncome: true, date: "14 พ.ค. 69" },
+    { id: 2, title: "ซื้อ Pikachu VMAX", amount: "-฿3,500", isIncome: false, date: "12 พ.ค. 69" },
+    { id: 3, title: "เติมเงินเข้าระบบ", amount: "+฿5,000", isIncome: true, date: "10 พ.ค. 69" },
+  ]);
 
   const allCards = [
     { id: 1, name: "Pikachu VMAX", price: "฿12,500", condition: "Mint", image: "https://images.pokemontcg.io/swsh4/44_hires.png" },
@@ -60,37 +66,56 @@ function App() {
     { id: 4, name: "Rayquaza VMAX", price: "฿5,500", condition: "Mint", image: "https://images.pokemontcg.io/swsh7/111_hires.png" },
   ];
 
-  const transactions = [
-    { id: 1, title: "ขาย Mewtwo GX", amount: "+฿1,200", isIncome: true, date: "14 พ.ค. 26" },
-    { id: 2, title: "ซื้อ Pikachu VMAX", amount: "-฿3,500", isIncome: false, date: "12 พ.ค. 26" },
-    { id: 3, title: "เติมเงินเข้าระบบ", amount: "+฿5,000", isIncome: true, date: "10 พ.ค. 26" },
-  ];
-
   const displayedCards = allCards.filter(card =>
     card.name.toLowerCase().includes(searchQuery.toLowerCase())
   );
 
-  // ฟังก์ชันเอาของลงตะกร้า (พร้อมเด้งกลับหน้าแรก)
   const addToCart = (card) => {
-    // สร้างของชิ้นใหม่โดยสุ่ม ID ให้มัน จะได้ลบถูกชิ้นถ้าซื้อซ้ำ
     const newItem = { ...card, cartId: Math.random().toString() };
     setCart([...cart, newItem]);
     alert(`เพิ่ม ${card.name} ลงตะกร้าแล้ว!`);
     setCurrentView("market");
   };
 
-  // ฟังก์ชันลบของออกจากตะกร้า
   const removeFromCart = (cartIdToRemove) => {
     setCart(cart.filter(item => item.cartId !== cartIdToRemove));
   };
 
-  // ฟังก์ชันคำนวณราคารวมในตะกร้า (ลบ ฿ และ , ออกเพื่อแปลงเป็นตัวเลขคำนวณ)
-  const calculateTotal = () => {
-    const total = cart.reduce((sum, item) => {
+  // ดึงยอดรวมมาเป็นตัวเลข (เพื่อเอาไปคำนวณ)
+  const getCartTotalNumber = () => {
+    return cart.reduce((sum, item) => {
       const numericPrice = parseInt(item.price.replace(/[^0-9]/g, ''));
       return sum + numericPrice;
     }, 0);
-    return `฿${total.toLocaleString()}`; // แปลงกลับเป็นสตริงที่มีลูกน้ำสวยๆ
+  };
+
+  // 🌟 ไฮไลต์: ฟังก์ชันยืนยันการสั่งซื้อ
+  const handleCheckout = () => {
+    const total = getCartTotalNumber();
+    
+    // 1. เช็คยอดเงิน
+    if (balance < total) {
+      alert("ยอดเงินในกระเป๋าไม่พอ! กรุณาเติมเงิน 🥲");
+      return;
+    }
+
+    // 2. หักยอดเงิน
+    setBalance(balance - total);
+
+    // 3. สร้างประวัติรายจ่ายใหม่แปะไว้บนสุด
+    const newTx = {
+      id: Date.now(),
+      title: `ซื้อการ์ด ${cart.length} ใบ`,
+      amount: `-฿${total.toLocaleString()}`,
+      isIncome: false,
+      date: "02 มิ.ย. 69" // วันที่จำลอง
+    };
+    setTransactions([newTx, ...transactions]);
+
+    // 4. ล้างตะกร้า แจ้งเตือน และเด้งไปหน้ากระเป๋าเงิน
+    setCart([]);
+    alert("ชำระเงินสำเร็จ! ขอบคุณที่อุดหนุนครับ 🎉");
+    setCurrentView("wallet");
   };
 
   // --- หน้า Detail ---
@@ -132,7 +157,7 @@ function App() {
         <div className="wallet-container">
           <div className="balance-card">
             <p className="balance-label">ยอดเงินปัจจุบัน</p>
-            <p className="balance-amount">฿12,450</p>
+            <p className="balance-amount">฿{balance.toLocaleString()}</p>
           </div>
           <h2 className="section-title" style={{ padding: 0 }}>TRANSACTION HISTORY</h2>
           <div className="tx-list">
@@ -176,3 +201,60 @@ function App() {
                       <h4 style={{ color: '#FFD700', marginTop: '4px' }}>{item.price}</h4>
                     </div>
                     <button className="remove-btn" onClick={() => removeFromCart(item.cartId)}>ลบ</button>
+                  </div>
+                ))}
+              </div>
+
+              <div className="checkout-box">
+                <p style={{ color: '#aaaaaa', marginBottom: '8px' }}>ยอดชำระทั้งหมด</p>
+                <h2 style={{ color: '#FFD700', fontSize: '32px' }}>฿{getCartTotalNumber().toLocaleString()}</h2>
+                {/* ปุ่มยืนยันสั่งซื้อ ที่ผูกกับฟังก์ชันหักเงิน */}
+                <button className="buy-btn" onClick={handleCheckout}>
+                  ยืนยันการสั่งซื้อ
+                </button>
+              </div>
+            </>
+          )}
+        </div>
+      </div>
+    );
+  }
+
+  // --- หน้า Market (หน้าแรก) ---
+  return (
+    <div className="app-container">
+      <header className="header">
+        <h1 className="title">PIKACHU MARKET</h1>
+        
+        <div className="header-actions">
+          <div className="cart-btn-wrapper" onClick={() => setCurrentView("cart")} style={{ cursor: 'pointer' }}>
+            <span style={{ fontSize: '24px' }}>🛒</span>
+            {cart.length > 0 && <span className="cart-badge">{cart.length}</span>}
+          </div>
+          <button className="wallet-btn" onClick={() => setCurrentView("wallet")}>💳</button>
+        </div>
+      </header>
+
+      <div className="search-container">
+        <input type="text" placeholder="ค้นหาการ์ดที่ต้องการ..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="search-input" />
+      </div>
+
+      <h2 className="section-title">⚡ HOT DEALS</h2>
+
+      <div className="card-grid">
+        {displayedCards.map((card, index) => (
+          <div key={index} className="card" onClick={() => { setSelectedCard(card); setCurrentView("detail"); }}>
+            <img src={card.image} alt={card.name} className="card-image" />
+            <div className="card-info">
+              <h3 className="card-name">{card.name}</h3>
+              <p className="card-condition">สภาพ: {card.condition}</p>
+              <p className="card-price">{card.price}</p>
+            </div>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+export default App;
