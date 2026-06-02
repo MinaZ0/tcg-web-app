@@ -47,13 +47,16 @@ function Interactive3DCard({ image, name }) {
 function App() {
   // 🌟 State สำหรับระบบบัญชี
   const [isLoggedIn, setIsLoggedIn] = useState(false);
-  const [authMode, setAuthMode] = useState("login"); // "login" | "register" | "forgot"
+  const [authMode, setAuthMode] = useState("login");
   
   // ข้อมูลฟอร์ม
   const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] = useState("");
+
+  // 🌟 ไฮไลต์: สร้างตะกร้าเก็บรายชื่อสมาชิกจำลอง
+  const [users, setUsers] = useState([]);
 
   // State ตลาดและกระเป๋าเงิน
   const [currentView, setCurrentView] = useState("market"); 
@@ -78,19 +81,27 @@ function App() {
   // ----------------------------------------------------------------------
   const handleLogin = (e) => {
     e.preventDefault();
-    
     if (!username || !password) {
       alert("กรุณากรอก Username และ Password ให้ครบถ้วนครับ!");
       return;
     }
 
-    // 🌟 ระบบรหัสลับสำหรับ Dev (Username: dev, Password: 1234)
+    // 1. เช็ครหัส Dev ก่อน
     if (username === "dev" && password === "1234") {
       setIsLoggedIn(true);
       setCurrentView("market");
       alert("ยินดีต้อนรับเข้าสู่โหมด Developer 🛠️");
+      return;
+    }
+
+    // 2. เช็คจากรายชื่อที่สมัครเข้ามาใหม่
+    const validUser = users.find(u => u.username === username && u.password === password);
+    if (validUser) {
+      setIsLoggedIn(true);
+      setCurrentView("market");
+      alert(`ยินดีต้อนรับคุณ ${username} 🎉`);
     } else {
-      alert("Username หรือ Password ไม่ถูกต้อง!");
+      alert("Username หรือ Password ไม่ถูกต้อง หรือยังไม่ได้สมัครสมาชิกครับ!");
     }
   };
 
@@ -104,7 +115,18 @@ function App() {
       alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง!");
       return;
     }
-    alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${username}`);
+    
+    // เช็คว่ามีคนใช้ชื่อนี้ไปหรือยัง
+    const isExist = users.find(u => u.username === username);
+    if (isExist || username === "dev") {
+      alert("Username นี้มีผู้ใช้งานแล้ว กรุณาใช้ชื่ออื่นครับ!");
+      return;
+    }
+
+    // เก็บข้อมูลลง State users
+    setUsers([...users, { username, email, password }]);
+    
+    alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${username}\nตอนนี้คุณสามารถเข้าสู่ระบบด้วยรหัสผ่านที่คุณตั้งไว้ได้เลยครับ!`);
     setAuthMode("login"); 
     setPassword("");
     setConfirmPassword("");
@@ -144,7 +166,6 @@ function App() {
             <p className="auth-subtitle">ตลาดการ์ดระดับพรีเมียม</p>
           )}
 
-          {/* แท็บสลับหน้า */}
           {authMode !== "forgot" && (
             <div className="auth-tabs">
               <button className={`auth-tab-btn ${authMode === "login" ? "active" : ""}`} onClick={() => setAuthMode("login")}>เข้าสู่ระบบ</button>
@@ -152,7 +173,6 @@ function App() {
             </div>
           )}
 
-          {/* ฟอร์ม: Login */}
           {authMode === "login" && (
             <form className="auth-form" onSubmit={handleLogin}>
               <input type="text" placeholder="Username" className="auth-input" value={username} onChange={(e) => setUsername(e.target.value)} />
@@ -162,7 +182,6 @@ function App() {
             </form>
           )}
 
-          {/* ฟอร์ม: Sign Up */}
           {authMode === "register" && (
             <form className="auth-form" onSubmit={handleRegister}>
               <input type="text" placeholder="Username" className="auth-input" value={username} onChange={(e) => setUsername(e.target.value)} />
@@ -173,7 +192,6 @@ function App() {
             </form>
           )}
 
-          {/* ฟอร์ม: Forgot Password */}
           {authMode === "forgot" && (
             <form className="auth-form" onSubmit={handleForgotPassword}>
               <input type="email" placeholder="กรอกอีเมลของคุณ" className="auth-input" value={email} onChange={(e) => setEmail(e.target.value)} />
@@ -214,7 +232,6 @@ function App() {
     setCurrentView("wallet");
   };
 
-  // --- หน้า Detail ---
   if (currentView === "detail" && selectedCard) {
     return (
       <div className="app-container">
@@ -236,7 +253,6 @@ function App() {
     );
   }
 
-  // --- หน้า Wallet ---
   if (currentView === "wallet") {
     return (
       <div className="app-container">
@@ -265,7 +281,6 @@ function App() {
     );
   }
 
-  // --- หน้า ตะกร้าสินค้า (Cart) ---
   if (currentView === "cart") {
     return (
       <div className="app-container">
@@ -303,7 +318,6 @@ function App() {
     );
   }
 
-  // --- หน้า Market (หน้าแรก) ---
   return (
     <div className="app-container">
       <header className="header">
