@@ -1,282 +1,168 @@
 /* src/App.css */
-* {
-  box-sizing: border-box;
-  margin: 0;
-  padding: 0;
-  font-family: 'Kanit', sans-serif;
-}
+* { box-sizing: border-box; margin: 0; padding: 0; font-family: 'Kanit', sans-serif; }
 
-body {
-  background-color: #121212; /* พื้นหลังสีดำเข้ม */
-  color: white;
-}
+body { background-color: #121212; color: white; }
 
-.app-container {
-  max-width: 500px;
-  margin: 0 auto;
-  padding-bottom: 20px;
-}
+.app-container { max-width: 500px; margin: 0 auto; padding-bottom: 20px; }
 
-.header {
+/* ------------------------------------------- */
+/* ระบบบัญชี (Auth - Login, Sign Up, Forgot Pass) */
+/* ------------------------------------------- */
+.auth-wrapper {
   display: flex;
-  justify-content: space-between;
+  justify-content: center;
   align-items: center;
-  padding: 20px 16px;
-}
-
-.title {
-  color: #FFD700;
-  font-size: 20px;
-  font-weight: bold;
-}
-
-.wallet-btn {
-  background: none;
-  border: none;
-  font-size: 24px;
-  cursor: pointer;
-}
-
-.search-container {
-  padding: 0 16px;
-  margin-bottom: 20px;
-}
-
-.search-input {
-  width: 100%;
-  padding: 12px 16px;
-  border-radius: 15px;
-  border: 2px solid transparent;
-  background-color: #1E1E1E;
-  color: white;
-  font-size: 16px;
-  outline: none;
-  transition: border 0.3s;
-}
-
-.search-input:focus {
-  border-color: #FFD700; /* ขอบสีเหลืองตอนกดพิมพ์ */
-}
-
-.section-title {
-  padding: 0 16px;
-  margin-bottom: 16px;
-  font-size: 22px;
-}
-
-.card-grid {
-  display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 16px;
-  padding: 0 16px;
-}
-
-.card {
-  background-color: #1E1E1E;
-  border: 1.5px solid rgba(255, 215, 0, 0.6);
-  border-radius: 16px;
-  overflow: hidden;
-  box-shadow: 0 4px 15px rgba(255, 215, 0, 0.15);
-  cursor: pointer;
-  transition: transform 0.2s;
-}
-
-.card:hover {
-  transform: translateY(-5px); /* เอฟเฟกต์เด้งขึ้นเบาๆ ตอนเอาเมาส์ชี้ */
-}
-
-.card-image {
-  width: 100%;
-  height: 250px;
-  object-fit: cover;
-  display: block;
-}
-
-.card-info {
-  padding: 12px;
-}
-
-.card-name {
-  font-size: 14px;
-  font-weight: bold;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.card-condition {
-  font-size: 12px;
-  color: #aaaaaa;
-  margin: 4px 0 8px 0;
-}
-
-.card-price {
-  font-size: 16px;
-  color: #FFD700;
-  font-weight: bold;
-}
-/* ------------------------------------------- */
-/* เอฟเฟกต์ 3D Holographic Card และหน้ารายละเอียด */
-/* ------------------------------------------- */
-
-.back-btn {
-  background: none;
-  border: none;
-  color: #FFD700;
-  font-size: 16px;
-  cursor: pointer;
-  font-weight: bold;
-}
-
-.detail-container {
+  min-height: 100vh;
   padding: 16px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+  background: radial-gradient(circle at top right, #2a2200, #121212 50%);
 }
 
-/* กรอบการ์ด 3D */
-.interactive-card-wrapper {
-  position: relative;
+.auth-box {
+  background-color: rgba(30, 30, 30, 0.8);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(255, 215, 0, 0.3);
+  border-radius: 24px;
+  padding: 40px 24px;
   width: 100%;
-  max-width: 320px;
-  height: 450px;
-  border-radius: 20px;
-  border: 1px solid rgba(255, 215, 0, 0.4);
-  box-shadow: 0 15px 35px rgba(255, 215, 0, 0.2);
-  transform-style: preserve-3d;
-  overflow: hidden;
-  cursor: grab;
-  margin-bottom: 30px;
-  /* เวลากลับมาหน้าตรงให้ค่อยๆ สมูท */
-  transition: transform 0.2s ease-out; 
-}
-
-.interactive-card-wrapper:active {
-  cursor: grabbing;
-}
-
-.interactive-card-image {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* เลเยอร์แสงสะท้อนฟอยล์ */
-.interactive-card-glare {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none; /* เพื่อไม่ให้ตัวแสงขวางการคลิกเมาส์ */
-  transition: opacity 0.3s ease;
-  mix-blend-mode: color-dodge; /* ทำให้แสงดูสว่างแบบฟอยล์จริง */
-}
-
-.action-box {
-  width: 100%;
-  background-color: #1E1E1E;
-  border: 1px solid #FFD700;
-  border-radius: 20px;
-  padding: 20px;
+  max-width: 400px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.5), 0 0 20px rgba(255, 215, 0, 0.1);
   text-align: center;
 }
 
-.buy-btn {
+.auth-logo { font-size: 50px; margin-bottom: 8px; filter: drop-shadow(0 0 10px rgba(255, 215, 0, 0.5)); }
+.auth-title { color: #FFD700; font-size: 26px; font-weight: bold; margin-bottom: 4px; letter-spacing: 1px; }
+.auth-subtitle { color: #aaaaaa; font-size: 14px; margin-bottom: 24px; }
+
+/* แท็บสลับโหมด Login / Sign Up */
+.auth-tabs {
+  display: flex;
+  background-color: #121212;
+  border-radius: 12px;
+  margin-bottom: 24px;
+  padding: 4px;
+}
+
+.auth-tab-btn {
+  flex: 1;
+  padding: 10px;
+  background: transparent;
+  border: none;
+  color: #aaaaaa;
+  font-size: 14px;
+  font-weight: bold;
+  border-radius: 8px;
+  cursor: pointer;
+  transition: 0.3s;
+}
+
+.auth-tab-btn.active { background-color: #FFD700; color: #121212; }
+
+.auth-form { display: flex; flex-direction: column; gap: 16px; }
+
+.auth-input {
   width: 100%;
-  padding: 15px;
+  padding: 14px 16px;
+  border-radius: 12px;
+  border: 1px solid #333;
+  background-color: rgba(18, 18, 18, 0.8);
+  color: white;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.3s;
+}
+
+.auth-input:focus { border-color: #FFD700; box-shadow: 0 0 8px rgba(255, 215, 0, 0.2); }
+
+.auth-btn-primary {
+  width: 100%;
+  padding: 14px;
   background-color: #FFD700;
   color: black;
   border: none;
-  border-radius: 15px;
-  font-size: 18px;
-  font-weight: bold;
-  cursor: pointer;
-  margin-top: 16px;
-}
-
-.buy-btn:hover {
-  background-color: #e6c200;
-}
-
-/* ------------------------------------------- */
-/* ระบบตะกร้าสินค้า (Cart) */
-/* ------------------------------------------- */
-
-.header-actions {
-  display: flex;
-  gap: 16px;
-  align-items: center;
-}
-
-.cart-btn-wrapper {
-  position: relative;
-}
-
-.cart-badge {
-  position: absolute;
-  top: -5px;
-  right: -8px;
-  background-color: #f87171; /* สีแดง */
-  color: white;
-  font-size: 10px;
-  font-weight: bold;
-  border-radius: 50%;
-  padding: 2px 6px;
-}
-
-.cart-item {
-  display: flex;
-  align-items: center;
-  background-color: #1E1E1E;
-  border: 1px solid rgba(255, 215, 0, 0.2);
-  padding: 12px;
   border-radius: 12px;
-  margin-bottom: 12px;
-}
-
-.cart-item-img {
-  width: 60px;
-  height: 85px;
-  object-fit: cover;
-  border-radius: 8px;
-  margin-right: 16px;
-}
-
-.cart-item-info {
-  flex: 1;
-}
-
-.remove-btn {
-  background-color: transparent;
-  color: #f87171;
-  border: 1px solid #f87171;
-  padding: 6px 12px;
-  border-radius: 8px;
-  cursor: pointer;
+  font-size: 16px;
   font-weight: bold;
+  cursor: pointer;
+  margin-top: 8px;
   transition: 0.2s;
 }
+.auth-btn-primary:hover { background-color: #e6c200; transform: translateY(-2px); }
 
-.remove-btn:hover {
-  background-color: #f87171;
-  color: white;
+.auth-text-link {
+  color: #FFD700;
+  font-size: 12px;
+  cursor: pointer;
+  margin-top: 16px;
+  text-decoration: underline;
+  background: none;
+  border: none;
 }
 
-.checkout-box {
-  background-color: #1E1E1E;
-  border: 1px solid #FFD700;
-  border-radius: 20px;
-  padding: 20px;
-  margin-top: 30px;
-  text-align: center;
-}
+/* ------------------------------------------- */
+/* โครงสร้างหลัก E-Commerce (Market, Cart, Detail) */
+/* ------------------------------------------- */
+.header { display: flex; justify-content: space-between; align-items: center; padding: 20px 16px; }
+.title { color: #FFD700; font-size: 20px; font-weight: bold; }
+.wallet-btn { background: none; border: none; font-size: 24px; cursor: pointer; transition: 0.2s; }
+.wallet-btn:hover { transform: scale(1.1); }
 
-.empty-cart {
-  text-align: center;
-  color: #aaaaaa;
-  padding: 40px 0;
-  font-size: 16px;
+.search-container { padding: 0 16px; margin-bottom: 20px; }
+.search-input {
+  width: 100%; padding: 12px 16px; border-radius: 15px; border: 2px solid transparent;
+  background-color: #1E1E1E; color: white; font-size: 16px; outline: none; transition: 0.3s;
 }
+.search-input:focus { border-color: #FFD700; }
+.section-title { padding: 0 16px; margin-bottom: 16px; font-size: 22px; }
+
+/* ตลาดการ์ด */
+.card-grid { display: grid; grid-template-columns: repeat(2, 1fr); gap: 16px; padding: 0 16px; }
+.card {
+  background-color: #1E1E1E; border: 1.5px solid rgba(255, 215, 0, 0.4); border-radius: 16px;
+  overflow: hidden; cursor: pointer; transition: 0.3s;
+}
+.card:hover { transform: translateY(-5px); border-color: #FFD700; box-shadow: 0 8px 20px rgba(255, 215, 0, 0.2); }
+.card-image { width: 100%; height: 250px; object-fit: cover; display: block; }
+.card-info { padding: 12px; }
+.card-name { font-size: 14px; font-weight: bold; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.card-condition { font-size: 12px; color: #aaaaaa; margin: 4px 0 8px 0; }
+.card-price { font-size: 16px; color: #FFD700; font-weight: bold; }
+
+/* หน้า Detail และ 3D Card */
+.back-btn { background: none; border: none; color: #FFD700; font-size: 16px; cursor: pointer; font-weight: bold; }
+.detail-container { padding: 16px; display: flex; flex-direction: column; align-items: center; }
+.interactive-card-wrapper {
+  position: relative; width: 100%; max-width: 320px; height: 450px; border-radius: 20px;
+  border: 1px solid rgba(255, 215, 0, 0.6); box-shadow: 0 15px 35px rgba(255, 215, 0, 0.3);
+  transform-style: preserve-3d; overflow: hidden; margin-bottom: 30px; transition: transform 0.2s ease-out;
+}
+.interactive-card-image { width: 100%; height: 100%; object-fit: cover; display: block; }
+.interactive-card-glare { position: absolute; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; mix-blend-mode: color-dodge; transition: opacity 0.3s ease; }
+.action-box { width: 100%; background-color: #1E1E1E; border: 1px solid rgba(255, 215, 0, 0.5); border-radius: 20px; padding: 20px; text-align: center; }
+
+/* กระเป๋าเงินและตะกร้า */
+.wallet-container { padding: 16px; }
+.balance-card { background: linear-gradient(135deg, #FFD700, #b39700); border-radius: 20px; padding: 30px; text-align: center; margin-bottom: 30px; box-shadow: 0 10px 20px rgba(255, 215, 0, 0.2); }
+.balance-label { color: rgba(0, 0, 0, 0.7); font-size: 16px; font-weight: bold; margin-bottom: 8px; }
+.balance-amount { color: black; font-size: 40px; font-weight: bold; }
+.tx-list { display: flex; flex-direction: column; gap: 12px; }
+.tx-item { background-color: #1E1E1E; border: 1px solid rgba(255, 255, 255, 0.1); border-radius: 12px; padding: 16px; display: flex; justify-content: space-between; align-items: center; }
+.tx-info { display: flex; flex-direction: column; gap: 4px; }
+.tx-title { color: white; font-size: 16px; }
+.tx-date { color: #aaaaaa; font-size: 12px; }
+.tx-amount { font-size: 18px; font-weight: bold; }
+.tx-income { color: #4ade80; }
+.tx-expense { color: #f87171; }
+.logout-btn { width: 100%; padding: 15px; background: transparent; color: #f87171; border: 1px solid #f87171; border-radius: 15px; font-size: 16px; font-weight: bold; cursor: pointer; margin-top: 24px; transition: 0.2s; }
+.logout-btn:hover { background-color: rgba(248, 113, 113, 0.1); }
+
+/* ตะกร้า (Cart) */
+.header-actions { display: flex; gap: 16px; align-items: center; }
+.cart-btn-wrapper { position: relative; }
+.cart-badge { position: absolute; top: -5px; right: -8px; background-color: #f87171; color: white; font-size: 10px; font-weight: bold; border-radius: 50%; padding: 2px 6px; }
+.cart-item { display: flex; align-items: center; background-color: #1E1E1E; border: 1px solid rgba(255, 215, 0, 0.2); padding: 12px; border-radius: 12px; margin-bottom: 12px; }
+.cart-item-img { width: 60px; height: 85px; object-fit: cover; border-radius: 8px; margin-right: 16px; }
+.cart-item-info { flex: 1; }
+.remove-btn { background-color: transparent; color: #f87171; border: 1px solid #f87171; padding: 6px 12px; border-radius: 8px; cursor: pointer; font-weight: bold; transition: 0.2s; }
+.remove-btn:hover { background-color: #f87171; color: white; }
+.checkout-box { background-color: #1E1E1E; border: 1px solid #FFD700; border-radius: 20px; padding: 20px; margin-top: 30px; text-align: center; }
+.empty-cart { text-align: center; color: #aaaaaa; padding: 40px 0; font-size: 16px; }

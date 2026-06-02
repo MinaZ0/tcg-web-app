@@ -20,7 +20,6 @@ function Interactive3DCard({ image, name }) {
     const rotateY = ((x - centerX) / centerX) * 15;
 
     setTransformStyle(`perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg) scale3d(1.05, 1.05, 1.05)`);
-    
     const glareX = (x / rect.width) * 100;
     const glareY = (y / rect.height) * 100;
     setGlareStyle({
@@ -43,24 +42,28 @@ function Interactive3DCard({ image, name }) {
 }
 
 // ----------------------------------------------------------------------
-// Component หลัก: ควบคุมหน้าจอทั้งหมด
+// Component หลัก
 // ----------------------------------------------------------------------
 function App() {
-  // 🌟 ไฮไลต์: State สำหรับระบบ Login
+  // 🌟 State สำหรับระบบบัญชี
   const [isLoggedIn, setIsLoggedIn] = useState(false);
+  const [authMode, setAuthMode] = useState("login"); // "login" | "register" | "forgot"
+  
+  // ข้อมูลฟอร์ม
   const [username, setUsername] = useState("");
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
+  // State ตลาดและกระเป๋าเงิน
   const [currentView, setCurrentView] = useState("market"); 
   const [selectedCard, setSelectedCard] = useState(null);
   const [searchQuery, setSearchQuery] = useState("");
   const [cart, setCart] = useState([]);
-
   const [balance, setBalance] = useState(12450);
   const [transactions, setTransactions] = useState([
     { id: 1, title: "ขาย Mewtwo GX", amount: "+฿1,200", isIncome: true, date: "14 พ.ค. 69" },
     { id: 2, title: "ซื้อ Pikachu VMAX", amount: "-฿3,500", isIncome: false, date: "12 พ.ค. 69" },
-    { id: 3, title: "เติมเงินเข้าระบบ", amount: "+฿5,000", isIncome: true, date: "10 พ.ค. 69" },
   ]);
 
   const allCards = [
@@ -70,98 +73,136 @@ function App() {
     { id: 4, name: "Rayquaza VMAX", price: "฿5,500", condition: "Mint", image: "https://images.pokemontcg.io/swsh7/111_hires.png" },
   ];
 
-  // ฟังก์ชันจัดการตอนกด Login
+  // ----------------------------------------------------------------------
+  // ฟังก์ชันจัดการระบบบัญชี
+  // ----------------------------------------------------------------------
   const handleLogin = (e) => {
-    e.preventDefault(); // ป้องกันเว็บรีเฟรชตอนกด Submit
-    if (username !== "" && password !== "") {
+    e.preventDefault();
+    if (username && password) {
       setIsLoggedIn(true);
+      setCurrentView("market");
     } else {
       alert("กรุณากรอก Username และ Password ให้ครบถ้วนครับ!");
     }
   };
 
-  // ฟังก์ชันจัดการตอนกด Logout
+  const handleRegister = (e) => {
+    e.preventDefault();
+    if (!username || !email || !password || !confirmPassword) {
+      alert("กรุณากรอกข้อมูลให้ครบทุกช่องครับ!");
+      return;
+    }
+    if (password !== confirmPassword) {
+      alert("รหัสผ่านไม่ตรงกัน กรุณาตรวจสอบอีกครั้ง!");
+      return;
+    }
+    alert(`สมัครสมาชิกสำเร็จ! ยินดีต้อนรับคุณ ${username}`);
+    setAuthMode("login"); // กลับไปหน้า Login
+    setPassword("");
+    setConfirmPassword("");
+  };
+
+  const handleForgotPassword = (e) => {
+    e.preventDefault();
+    if (!email) {
+      alert("กรุณากรอกอีเมลของคุณครับ!");
+      return;
+    }
+    alert(`ระบบได้ส่งลิงก์รีเซ็ตรหัสผ่านไปที่ ${email} เรียบร้อยแล้ว!`);
+    setAuthMode("login");
+    setEmail("");
+  };
+
   const handleLogout = () => {
     setIsLoggedIn(false);
-    setCurrentView("market"); // รีเซ็ตหน้ากลับไปที่ตลาด
+    setAuthMode("login");
     setUsername("");
     setPassword("");
   };
 
   // ----------------------------------------------------------------------
-  // หน้าจอ: Login
+  // หน้าจอ: Auth (ถ้ายังไม่ล็อกอิน)
   // ----------------------------------------------------------------------
   if (!isLoggedIn) {
     return (
-      <div className="login-wrapper">
-        <div className="login-box">
-          <div className="login-logo">⚡</div>
-          <h1 className="login-title">PIKACHU MARKET</h1>
-          <p className="login-subtitle">ลงชื่อเข้าใช้เพื่อเข้าสู่ตลาดการ์ดระดับพรีเมียม</p>
+      <div className="auth-wrapper">
+        <div className="auth-box">
+          <div className="auth-logo">⚡</div>
+          <h1 className="auth-title">PIKACHU MARKET</h1>
           
-          <form className="login-form" onSubmit={handleLogin}>
-            <input 
-              type="text" 
-              placeholder="Username" 
-              className="login-input"
-              value={username}
-              onChange={(e) => setUsername(e.target.value)}
-            />
-            <input 
-              type="password" 
-              placeholder="Password" 
-              className="login-input"
-              value={password}
-              onChange={(e) => setPassword(e.target.value)}
-            />
-            <button type="submit" className="buy-btn" style={{ marginTop: '8px' }}>
-              เข้าสู่ระบบ
-            </button>
-          </form>
+          {authMode === "forgot" ? (
+            <p className="auth-subtitle">กู้คืนรหัสผ่านของคุณ</p>
+          ) : (
+            <p className="auth-subtitle">ตลาดการ์ดระดับพรีเมียม</p>
+          )}
+
+          {/* แท็บสลับหน้า (ซ่อนถ้าอยู่หน้าลืมรหัสผ่าน) */}
+          {authMode !== "forgot" && (
+            <div className="auth-tabs">
+              <button 
+                className={`auth-tab-btn ${authMode === "login" ? "active" : ""}`}
+                onClick={() => setAuthMode("login")}
+              >เข้าสู่ระบบ</button>
+              <button 
+                className={`auth-tab-btn ${authMode === "register" ? "active" : ""}`}
+                onClick={() => setAuthMode("register")}
+              >สมัครสมาชิก</button>
+            </div>
+          )}
+
+          {/* ฟอร์ม: Login */}
+          {authMode === "login" && (
+            <form className="auth-form" onSubmit={handleLogin}>
+              <input type="text" placeholder="Username" className="auth-input" value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input type="password" placeholder="Password" className="auth-input" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <button type="submit" className="auth-btn-primary">เข้าสู่ระบบ</button>
+              <button type="button" className="auth-text-link" onClick={() => setAuthMode("forgot")}>ลืมรหัสผ่านใช่หรือไม่?</button>
+            </form>
+          )}
+
+          {/* ฟอร์ม: Sign Up */}
+          {authMode === "register" && (
+            <form className="auth-form" onSubmit={handleRegister}>
+              <input type="text" placeholder="Username" className="auth-input" value={username} onChange={(e) => setUsername(e.target.value)} />
+              <input type="email" placeholder="Email" className="auth-input" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <input type="password" placeholder="Password" className="auth-input" value={password} onChange={(e) => setPassword(e.target.value)} />
+              <input type="password" placeholder="Confirm Password" className="auth-input" value={confirmPassword} onChange={(e) => setConfirmPassword(e.target.value)} />
+              <button type="submit" className="auth-btn-primary">สร้างบัญชี</button>
+            </form>
+          )}
+
+          {/* ฟอร์ม: Forgot Password */}
+          {authMode === "forgot" && (
+            <form className="auth-form" onSubmit={handleForgotPassword}>
+              <input type="email" placeholder="กรอกอีเมลของคุณ" className="auth-input" value={email} onChange={(e) => setEmail(e.target.value)} />
+              <button type="submit" className="auth-btn-primary">ส่งลิงก์รีเซ็ตรหัสผ่าน</button>
+              <button type="button" className="auth-text-link" onClick={() => setAuthMode("login")}>⬅ กลับไปหน้าเข้าสู่ระบบ</button>
+            </form>
+          )}
+
         </div>
       </div>
     );
   }
 
-  // (ส่วนที่เหลือทำงานปกติเมื่อ isLoggedIn = true)
-
-  const displayedCards = allCards.filter(card =>
-    card.name.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  // ----------------------------------------------------------------------
+  // โค้ดเดิม (ระบบตะกร้าและชำระเงิน)
+  // ----------------------------------------------------------------------
+  const displayedCards = allCards.filter(card => card.name.toLowerCase().includes(searchQuery.toLowerCase()));
 
   const addToCart = (card) => {
-    const newItem = { ...card, cartId: Math.random().toString() };
-    setCart([...cart, newItem]);
+    setCart([...cart, { ...card, cartId: Math.random().toString() }]);
     alert(`เพิ่ม ${card.name} ลงตะกร้าแล้ว!`);
     setCurrentView("market");
   };
-
-  const removeFromCart = (cartIdToRemove) => {
-    setCart(cart.filter(item => item.cartId !== cartIdToRemove));
-  };
-
-  const getCartTotalNumber = () => {
-    return cart.reduce((sum, item) => {
-      const numericPrice = parseInt(item.price.replace(/[^0-9]/g, ''));
-      return sum + numericPrice;
-    }, 0);
-  };
+  const removeFromCart = (id) => setCart(cart.filter(item => item.cartId !== id));
+  const getCartTotalNumber = () => cart.reduce((sum, item) => sum + parseInt(item.price.replace(/[^0-9]/g, '')), 0);
 
   const handleCheckout = () => {
     const total = getCartTotalNumber();
-    if (balance < total) {
-      alert("ยอดเงินในกระเป๋าไม่พอ! กรุณาเติมเงิน 🥲");
-      return;
-    }
+    if (balance < total) return alert("ยอดเงินในกระเป๋าไม่พอ! กรุณาเติมเงิน 🥲");
     setBalance(balance - total);
-    const newTx = {
-      id: Date.now(),
-      title: `ซื้อการ์ด ${cart.length} ใบ`,
-      amount: `-฿${total.toLocaleString()}`,
-      isIncome: false,
-      date: "02 มิ.ย. 69"
-    };
-    setTransactions([newTx, ...transactions]);
+    setTransactions([{ id: Date.now(), title: `ซื้อการ์ด ${cart.length} ใบ`, amount: `-฿${total.toLocaleString()}`, isIncome: false, date: "02 มิ.ย. 69" }, ...transactions]);
     setCart([]);
     alert("ชำระเงินสำเร็จ! ขอบคุณที่อุดหนุนครับ 🎉");
     setCurrentView("wallet");
@@ -176,14 +217,13 @@ function App() {
           <h1 className="title" style={{ fontSize: '18px' }}>{selectedCard.name}</h1>
           <div style={{ width: '60px' }}></div>
         </header>
-
         <div className="detail-container">
           <Interactive3DCard image={selectedCard.image} name={selectedCard.name} />
           <div className="action-box">
             <p style={{ color: '#aaaaaa', marginBottom: '8px' }}>ราคาปัจจุบัน</p>
             <h2 style={{ color: '#FFD700', fontSize: '32px' }}>{selectedCard.price}</h2>
             <p style={{ marginTop: '8px', marginBottom: '20px' }}>สภาพ: {selectedCard.condition}</p>
-            <button className="buy-btn" onClick={() => addToCart(selectedCard)}>หยิบใส่ตะกร้า</button>
+            <button className="auth-btn-primary" onClick={() => addToCart(selectedCard)}>หยิบใส่ตะกร้า</button>
           </div>
         </div>
       </div>
@@ -199,7 +239,6 @@ function App() {
           <h1 className="title">MY WALLET</h1>
           <div style={{ width: '60px' }}></div>
         </header>
-
         <div className="wallet-container">
           <div className="balance-card">
             <p className="balance-label">ยอดเงินปัจจุบัน</p>
@@ -209,19 +248,12 @@ function App() {
           <div className="tx-list">
             {transactions.map(tx => (
               <div key={tx.id} className="tx-item">
-                <div className="tx-info">
-                  <span className="tx-title">{tx.isIncome ? '⬆️' : '⬇️'} {tx.title}</span>
-                  <span className="tx-date">{tx.date}</span>
-                </div>
+                <div className="tx-info"><span className="tx-title">{tx.isIncome ? '⬆️' : '⬇️'} {tx.title}</span><span className="tx-date">{tx.date}</span></div>
                 <span className={`tx-amount ${tx.isIncome ? 'tx-income' : 'tx-expense'}`}>{tx.amount}</span>
               </div>
             ))}
           </div>
-
-          {/* ปุ่ม Logout ในหน้ากระเป๋าเงิน */}
-          <button className="logout-btn" onClick={handleLogout}>
-            ออกจากระบบ
-          </button>
+          <button className="logout-btn" onClick={handleLogout}>ออกจากระบบ</button>
         </div>
       </div>
     );
@@ -236,10 +268,9 @@ function App() {
           <h1 className="title">MY CART</h1>
           <div style={{ width: '60px' }}></div>
         </header>
-
         <div className="wallet-container">
           {cart.length === 0 ? (
-            <div className="empty-cart">ตะกร้าของคุณว่างเปล่า 🥲<br/>ไปหาการ์ดแรร์ๆ กันเถอะ!</div>
+            <div className="empty-cart">ตะกร้าของคุณว่างเปล่า 🥲</div>
           ) : (
             <>
               <div className="tx-list">
@@ -248,18 +279,16 @@ function App() {
                     <img src={item.image} alt={item.name} className="cart-item-img" />
                     <div className="cart-item-info">
                       <h4 style={{ color: 'white' }}>{item.name}</h4>
-                      <p style={{ color: '#aaaaaa', fontSize: '12px' }}>{item.condition}</p>
                       <h4 style={{ color: '#FFD700', marginTop: '4px' }}>{item.price}</h4>
                     </div>
                     <button className="remove-btn" onClick={() => removeFromCart(item.cartId)}>ลบ</button>
                   </div>
                 ))}
               </div>
-
               <div className="checkout-box">
                 <p style={{ color: '#aaaaaa', marginBottom: '8px' }}>ยอดชำระทั้งหมด</p>
                 <h2 style={{ color: '#FFD700', fontSize: '32px' }}>฿{getCartTotalNumber().toLocaleString()}</h2>
-                <button className="buy-btn" onClick={handleCheckout}>ยืนยันการสั่งซื้อ</button>
+                <button className="auth-btn-primary" onClick={handleCheckout}>ยืนยันการสั่งซื้อ</button>
               </div>
             </>
           )}
@@ -281,13 +310,10 @@ function App() {
           <button className="wallet-btn" onClick={() => setCurrentView("wallet")}>💳</button>
         </div>
       </header>
-
       <div className="search-container">
         <input type="text" placeholder="ค้นหาการ์ดที่ต้องการ..." value={searchQuery} onChange={(e) => setSearchQuery(e.target.value)} className="search-input" />
       </div>
-
       <h2 className="section-title">⚡ HOT DEALS</h2>
-
       <div className="card-grid">
         {displayedCards.map((card, index) => (
           <div key={index} className="card" onClick={() => { setSelectedCard(card); setCurrentView("detail"); }}>
